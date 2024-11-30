@@ -21,11 +21,11 @@ router.post('/upload-book', upload.fields([
 
     try {
         // Upload the book file
-        const bookFile = await put(file.originalname, file.buffer, { contentType: file.mimetype });
+        const bookFile = await put(file.originalname, file.buffer, { contentType: file.mimetype, access: 'public',multipart: true });
         const fileUrl = bookFile.url;
 
         // Upload the cover photo
-        const coverPhotoFile = await put(coverPhoto.originalname, coverPhoto.buffer, { contentType: coverPhoto.mimetype });
+        const coverPhotoFile = await put(coverPhoto.originalname, coverPhoto.buffer, { contentType: coverPhoto.mimetype, access:'public' });
         const coverPhotoUrl = coverPhotoFile.url;
 
         // Insert book details into the database

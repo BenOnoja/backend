@@ -20,7 +20,7 @@ router.put('/edit-book/:id', upload.fields([{ name: 'file', maxCount: 1 }, { nam
         // Update the book file
         if (req.files['file']) {
             const newFile = req.files['file'][0];
-            const newBookFile = await put(newFile.originalname, newFile.buffer, { contentType: newFile.mimetype });
+            const newBookFile = await put(newFile.originalname, newFile.buffer, { contentType: newFile.mimetype, access:'public', multipart:true });
             filePath = newBookFile.url;
 
             // Delete the old file
@@ -30,7 +30,7 @@ router.put('/edit-book/:id', upload.fields([{ name: 'file', maxCount: 1 }, { nam
         // Update the cover photo
         if (req.files['coverPhoto']) {
             const newCoverPhoto = req.files['coverPhoto'][0];
-            const newCoverPhotoFile = await put(newCoverPhoto.originalname, newCoverPhoto.buffer, { contentType: newCoverPhoto.mimetype });
+            const newCoverPhotoFile = await put(newCoverPhoto.originalname, newCoverPhoto.buffer, { contentType: newCoverPhoto.mimetype, access:true });
             coverPhotoPath = newCoverPhotoFile.url;
 
             // Delete the old cover photo

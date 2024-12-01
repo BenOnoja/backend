@@ -18,17 +18,7 @@ const createTables = async () => {
 
   try {
     await pool.query(`
-        CREATE TABLE IF NOT EXISTS reading_progress (
-            id SERIAL PRIMARY KEY,
-            book_id INTEGER NOT NULL,
-            telegram_user_id BIGINT NOT NULL,
-            current_page INTEGER DEFAULT 1,
-            last_read_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT reading_progress_book_id_telegram_user_id_key UNIQUE (book_id, telegram_user_id),
-            FOREIGN KEY (book_id) REFERENCES books(id),
-            FOREIGN KEY (telegram_user_id) REFERENCES users(telegram_user_id)
-        );
-
+        -- Create users table first, as it is referenced by other tables
         CREATE TABLE IF NOT EXISTS users (
             telegram_user_id BIGINT PRIMARY KEY,
             first_name TEXT NOT NULL,
@@ -40,6 +30,7 @@ const createTables = async () => {
             "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
 
+        -- Create books table next, as it is referenced by other tables
         CREATE TABLE IF NOT EXISTS books (
             id SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
@@ -55,6 +46,7 @@ const createTables = async () => {
             "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
 
+        -- Create transactions table next, as it references both users and books
         CREATE TABLE IF NOT EXISTS transactions (
             id SERIAL PRIMARY KEY,
             book_id INTEGER REFERENCES books(id),
@@ -66,6 +58,7 @@ const createTables = async () => {
             has_paid BOOLEAN DEFAULT FALSE
         );
 
+        -- Create bookreviews table next, as it references books and users
         CREATE TABLE IF NOT EXISTS bookreviews (
             id SERIAL PRIMARY KEY,
             book_id INTEGER REFERENCES books(id),
@@ -74,7 +67,18 @@ const createTables = async () => {
             review_text TEXT,
             review_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- Create reading_progress table last, as it references books and users
+        CREATE TABLE IF NOT EXISTS reading_progress (
+            id SERIAL PRIMARY KEY,
+            book_id INTEGER NOT NULL REFERENCES books(id),
+            telegram_user_id BIGINT NOT NULL REFERENCES users(telegram_user_id),
+            current_page INTEGER DEFAULT 1,
+            last_read_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT reading_progress_book_id_telegram_user_id_key UNIQUE (book_id, telegram_user_id)
+        );
     `);
+
     tablesCreated = true; // Set flag to true after tables are created
     console.log('Tables created or already exist');
   } catch (error) {

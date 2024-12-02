@@ -53,9 +53,6 @@ app.use('/api', deleteBookRoute);
 // Serve static files (book files and cover photos)
 
 
-// Start the server, etc.
-
-
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
